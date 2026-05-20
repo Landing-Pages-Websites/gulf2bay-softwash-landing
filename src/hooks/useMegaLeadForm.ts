@@ -7,7 +7,7 @@ import { useCallback, useEffect, useRef } from "react";
  * Reference: landing-page-forms skill + forwardit-landing pattern.
  *
  * Customer: Gulf2Bay Softwash (8cd09b64-b330-4e68-9607-40033f1fed9f)
- * Site:     e239fb04-c7d1-4b79-ae03-5bc27f31a77d (book.gulf2baysoftwash.com)
+ * Site:     000806d0-c9f5-4c9c-a11f-cdfd6cf3d6d4 (book.gulf2baysoftwash.com)
  *
  * Submission policy (Atlas task aa76a8ad-9749-4ea3-b28c-dfd295378eb8):
  *   - EVERY filled form submits to the lead API — qualified AND disqualified.
@@ -19,7 +19,7 @@ import { useCallback, useEffect, useRef } from "react";
 
 const DEFAULTS = {
   CUSTOMER_ID: "8cd09b64-b330-4e68-9607-40033f1fed9f", // Gulf2Bay Softwash
-  SITE_ID: "e239fb04-c7d1-4b79-ae03-5bc27f31a77d",
+  SITE_ID: "000806d0-c9f5-4c9c-a11f-cdfd6cf3d6d4",
   ENDPOINT: "https://analytics.gomega.ai/submission/submit",
 };
 

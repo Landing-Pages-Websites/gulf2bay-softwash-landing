@@ -20,11 +20,12 @@ const nunito = Nunito_Sans({
 
 // Tracking IDs — Gulf2Bay Softwash
 // Customer ID: 8cd09b64-b330-4e68-9607-40033f1fed9f
-// site_tracking row provisioned 2026-05-18; site_url set to book.gulf2baysoftwash.com on deploy.
-// GTM: director-supplied 2026-05-20 (task aa76a8ad) — GTM-KBFXTGLJ
+// Site provisioned via `mega site-tracking enable` on book.gulf2baysoftwash.com
+// 2026-05-20 (task aa76a8ad). Provisional row e239fb04 archived.
+// GTM: director-supplied 2026-05-20 — GTM-KBFXTGLJ
 // Google-only campaign at launch; no Meta Pixel.
-const SITE_ID = "e239fb04-c7d1-4b79-ae03-5bc27f31a77d";
-const SITE_KEY = "sk_mpboqjkx_b394xcjneun";
+const SITE_ID = "000806d0-c9f5-4c9c-a11f-cdfd6cf3d6d4";
+const SITE_KEY = "p5aqwc14bqbj3bng";
 const GTM_ID = "GTM-KBFXTGLJ";
 
 export const metadata: Metadata = {
