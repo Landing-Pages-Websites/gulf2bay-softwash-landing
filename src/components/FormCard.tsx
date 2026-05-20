@@ -79,6 +79,10 @@ export function FormCard({
 }: Props) {
   const { submit } = useMegaLeadForm();
   const formRef = useRef<HTMLFormElement>(null);
+  // Synchronous in-flight guard. React's setSubmitting is async, so multiple
+  // rapid clicks can pass the `if (submitting) return` check before state
+  // flips. The ref is set synchronously and blocks re-entry the same tick.
+  const inFlightRef = useRef(false);
 
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -103,8 +107,9 @@ export function FormCard({
     factor.length > 0;
 
   async function performSubmit() {
-    if (submitting || submitted) return;
+    if (inFlightRef.current || submitted) return;
     if (!canSubmit) return;
+    inFlightRef.current = true;
     setError(null);
     setSubmitting(true);
 
@@ -175,6 +180,8 @@ export function FormCard({
     } finally {
       setSubmitted(true);
       setSubmitting(false);
+      // Leave inFlightRef true — the page is in the success state and the
+      // form is unmounted. No reason to ever flip it back.
     }
   }
 
@@ -187,6 +194,9 @@ export function FormCard({
   // Prevents the Mega optimizer from firing form_submit on a native submit
   // event when validation would have blocked it (AGENTS.md HARD RULE #3).
   function handleButtonClick() {
+    // Synchronous re-entry guard — blocks rapid double/triple clicks before
+    // React's submitting state flips.
+    if (inFlightRef.current || submitted) return;
     if (!canSubmit) {
       formRef.current?.reportValidity();
       return;
