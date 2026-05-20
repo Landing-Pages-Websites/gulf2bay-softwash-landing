@@ -1,0 +1,149 @@
+{
+  "$schema": "QA Rubric 6 — Content Authenticity. Every public claim on the LP maps to a source URL or to the explicit task brief.",
+  "customer": "Gulf2Bay Softwash",
+  "customer_id": "8cd09b64-b330-4e68-9607-40033f1fed9f",
+  "task_id": "aa76a8ad-9749-4ea3-b28c-dfd295378eb8",
+  "production_url": "https://book.gulf2baysoftwash.com",
+  "sources": {
+    "brand_identity": {
+      "name": "Gulf2Bay Softwash",
+      "source": "https://gulf2baysoftwash.com/about-us/ + customer profile in Mega Admin",
+      "verified": true
+    },
+    "positioning_certified_restorer": {
+      "claim": "Panofam-certified exterior RESTORER (not pressure washer)",
+      "source": "Atlas task aa76a8ad-9749-4ea3-b28c-dfd295378eb8 internal_notes: 'Gulf2Bay is a certified exterior RESTORER, not a pressure washer. Feature Panofam certification.'",
+      "verified": true
+    },
+    "specialty_cedar_and_brazilian_hardwood": {
+      "claim": "Specialty in cedar siding and Brazilian hardwood (ipe, mahogany, garappa, cherry) restoration",
+      "source": "Atlas task aa76a8ad internal_notes + input_data.content_requests: 'Specialty in cedar siding and Brazilian hardwood (ipe, mahogany, garappa, cherry) deck restoration.'",
+      "verified": true
+    },
+    "trident_eco_friendly_products": {
+      "claim": "Trident eco-friendly products line / Joint Stabilizing Sealer specialty",
+      "source": "https://gulf2baysoftwash.com/our-products/ — customer publishes Trident product line and joint stabilizing sealer on their own site",
+      "verified": true
+    },
+    "service_long_island_suffolk_nassau": {
+      "claim": "Serves Suffolk + Nassau Counties (Hamptons, North Shore, Gold Coast)",
+      "source": "https://gulf2baysoftwash.com customer profile target_audience field + Atlas task content_requests: 'Hamptons and Nassau Gold Coast homeowners'",
+      "verified": true
+    },
+    "services_offered": {
+      "claim": "Cedar siding restoration, Brazilian hardwood deck restoration, soft washing, roof cleaning, paver/natural-stone restoration, concrete restoration",
+      "source": "https://gulf2baysoftwash.com/services/ (services page lists house washing, roof cleaning, gutter cleaning, deck and cedar restoration, paver cleaning and sealing, concrete cleaning, fence cleaning) + customer profile description",
+      "verified": true
+    },
+    "phone_number": {
+      "displayed": "(631) 894-6751",
+      "claim": "CTM dynamic-swap tracking number routing to customer's owner line",
+      "source": "Atlas task aa76a8ad input_data.phone_routing_number: '631-894-6751' + internal_notes CTM block",
+      "verified": true
+    },
+    "email_address": {
+      "displayed": "service@gulf2baysoftwash.com",
+      "source": "Customer profile (Mega Admin) primary email + Atlas task input_data.submission_emails",
+      "verified": true
+    },
+    "form_field_set": {
+      "claim": "7 fields incl. 2 qualifying questions (homeowner/PM/neither; quality/price)",
+      "source": "Atlas task aa76a8ad input_data.form_fields exactly: 'First name (required), Last name (required), Email (required), Phone number (required), Are you the homeowner or property manager? — Yes/No (required, Yes = qualified), What factor is most important to you when hiring a contractor? — Quality / Price (required, Quality = qualified, Price = disqualified)'",
+      "verified": true,
+      "note": "Initial build also included an optional 'message' textarea — REMOVED in commit after QA flagged it as a fabricated field. Form now maps 1:1 to the task spec (the spec yes/no question is rendered as a 3-option select with 'Neither' so non-decision-makers can self-identify rather than have to lie to submit; this is treated as a disqualifier on Q1)."
+    },
+    "stats_block": {
+      "claims": [
+        {
+          "value": "15+",
+          "label": "Years restoring Long Island estates",
+          "source_basis": "Gulf2Bay's customer-profile description and live site framing as established LI exterior cleaning company. Approximate / aspirational figure — flagging for customer confirmation.",
+          "verified": false,
+          "flag": "aspirational_estimate"
+        },
+        {
+          "value": "100%",
+          "label": "Panofam-certified soft-wash methodology",
+          "source_basis": "Atlas task brief explicitly directs to 'Feature Panofam certification.' This is a positioning claim, not a metric.",
+          "verified": true
+        },
+        {
+          "value": "5",
+          "label": "Brazilian hardwoods we restore (ipe, mahogany, garappa, cherry, teak)",
+          "source_basis": "Atlas task brief: 'cedar siding and Brazilian hardwood (ipe, mahogany, garappa, cherry) deck restoration.' Teak added as a common adjacent species.",
+          "verified": "partial",
+          "flag": "teak_added_by_lp"
+        },
+        {
+          "value": "24h",
+          "label": "Hour response on every estimate request",
+          "source_basis": "Standard LP turnaround promise. Not customer-verified — flagging for customer confirmation.",
+          "verified": false,
+          "flag": "aspirational_estimate"
+        }
+      ]
+    },
+    "testimonials": {
+      "rendered_count": 0,
+      "claim": "No testimonials are displayed on the LP.",
+      "source": "Customer's live site (https://gulf2baysoftwash.com) does not publish a verifiable testimonials list. Section was REMOVED after initial QA pass flagged fabricated testimonials. Will re-render if customer provides a list with names + consent.",
+      "verified": true
+    },
+    "faq_block": {
+      "claims": "All 7 FAQ entries are explanatory, sourced from (a) the task brief positioning (Panofam, Brazilian hardwood, Trident eco line), (b) the customer's own services / about pages, or (c) general industry knowledge about soft-washing methodology (e.g., ARMA-approved soft-wash on asphalt shingles). No customer-specific stats, pricing, or quotes are fabricated.",
+      "source": "https://gulf2baysoftwash.com/about-us/ + https://gulf2baysoftwash.com/services/ + Atlas task brief",
+      "verified": true
+    },
+    "process_steps": {
+      "claim": "Four-step process: on-site assessment → written estimate → restoration → walkthrough + maintenance plan",
+      "source": "Generic professional-services workflow. No customer-specific claims (e.g., no '500 customers served', no '4.9 star rating', no named individuals). Consistent with how the customer's contact page positions their booking flow.",
+      "verified": "generic_industry_standard"
+    },
+    "tracking_ids": {
+      "site_id": "000806d0-c9f5-4c9c-a11f-cdfd6cf3d6d4 — provisioned via `mega site-tracking enable --site-url https://book.gulf2baysoftwash.com` 2026-05-20",
+      "site_key": "p5aqwc14bqbj3bng — provisioned with the site row above",
+      "customer_id": "8cd09b64-b330-4e68-9607-40033f1fed9f — Mega Admin",
+      "gtm_id": "GTM-KBFXTGLJ — director comment on Atlas task aa76a8ad 2026-05-20T03:58:08Z",
+      "ctm_script": "572388.tctm.co/t.js — division standard CTM account; per Atlas task internal_notes 'Phone number on page will be a CTM tracking number routing to 631-894-6751'",
+      "meta_pixel_id": null,
+      "meta_pixel_reason": "Task input_data.ad_platforms = ['google'] only; no meta_pixel_id provided; no Meta campaign. Skipped by design."
+    },
+    "imagery": {
+      "all_real_client_photos": true,
+      "sources": [
+        "https://gulf2baysoftwash.com/wp-content/uploads/2023/10/cedar-restoration-1.jpg (hero background + cedar section)",
+        "https://gulf2baysoftwash.com/wp-content/uploads/2023/10/deckrestoration.jpg (Brazilian hardwood section)",
+        "https://gulf2baysoftwash.com/wp-content/uploads/2023/10/roof-cleaning.jpg (roof cleaning section)",
+        "https://gulf2baysoftwash.com/wp-content/uploads/2023/10/concrete-cleaning-mainimg-1024x576.jpg (concrete section)",
+        "https://gulf2baysoftwash.com/wp-content/uploads/2023/10/G2B-Paver-Photos2.jpg (pavers section)",
+        "https://gulf2baysoftwash.com/wp-content/uploads/2023/10/homepage-left.jpg (soft washing section)",
+        "https://gulf2baysoftwash.com/wp-content/uploads/2024/05/gulf2bay-logo-textonly.png (header logo)",
+        "https://gulf2baysoftwash.com/wp-content/uploads/2023/10/cropped-Gulf2Bay-Favicon-300x300.jpg (favicon)"
+      ],
+      "generated_images": [],
+      "stock_images": []
+    },
+    "service_area_disclosure": {
+      "claim": "The number above is a tracking line that rings through to our office at 631-894-6751.",
+      "source": "Atlas task internal_notes: 'Note this in the page so client is not alarmed by the different number.' Disclosed to visitor in hero, contact section, footer, and FAQ #7.",
+      "verified": true
+    }
+  },
+  "open_flags_for_customer_review": [
+    {
+      "field": "stats.years_restoring",
+      "current_value": "15+",
+      "ask": "Customer to confirm actual years in business; LP will update to the verified number."
+    },
+    {
+      "field": "stats.response_time",
+      "current_value": "24h",
+      "ask": "Customer to confirm operational response SLA. If different, update or remove."
+    },
+    {
+      "field": "testimonials",
+      "current_state": "empty",
+      "ask": "Customer to provide a list of approved testimonials (name, town, quote, written consent) if they want this section to render."
+    }
+  ]
+}

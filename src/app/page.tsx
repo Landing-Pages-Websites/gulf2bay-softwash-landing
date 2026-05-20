@@ -17,7 +17,6 @@ import {
   SERVICES,
   WHY_US,
   PROCESS_STEPS,
-  TESTIMONIALS,
   FAQS,
 } from "@/lib/content";
 
@@ -449,56 +448,6 @@ function ProcessSection() {
   );
 }
 
-function TestimonialsSection() {
-  return (
-    <section
-      id="testimonials"
-      className="bg-[var(--color-surface-alt)] py-20 sm:py-24"
-    >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6">
-        <Reveal>
-          <div className="text-center max-w-2xl mx-auto">
-            <span className="eyebrow">What estate owners say</span>
-            <h2 className="mt-3 text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[var(--color-accent)] leading-tight">
-              Trusted on Long Island&apos;s most demanding properties.
-            </h2>
-          </div>
-        </Reveal>
-
-        <div className="mt-12 grid md:grid-cols-2 gap-6">
-          {TESTIMONIALS.map((t, i) => (
-            <Reveal key={t.name} delay={i * 60}>
-              <figure className="bg-white rounded-2xl p-7 border border-[var(--color-line)] shadow-sm h-full flex flex-col">
-                <svg
-                  className="w-8 h-8 text-[var(--color-wood-300)]"
-                  viewBox="0 0 24 24"
-                  fill="currentColor"
-                  aria-hidden="true"
-                >
-                  <path d="M7.17 17.5c-1.36 0-2.5-.46-3.41-1.38C2.85 15.21 2.4 14.06 2.4 12.7c0-2.16.79-4.11 2.37-5.83 1.58-1.72 3.4-2.92 5.47-3.59l.96 1.8c-1.21.51-2.27 1.22-3.18 2.14-.91.91-1.5 1.9-1.78 2.96.36-.12.74-.18 1.13-.18 1.16 0 2.13.41 2.92 1.22.79.82 1.18 1.81 1.18 2.99 0 1.18-.42 2.17-1.27 2.97-.85.81-1.85 1.22-3.03 1.22Zm9.6 0c-1.36 0-2.5-.46-3.41-1.38-.91-.91-1.36-2.06-1.36-3.42 0-2.16.79-4.11 2.37-5.83 1.58-1.72 3.4-2.92 5.47-3.59l.96 1.8c-1.21.51-2.27 1.22-3.18 2.14-.91.91-1.5 1.9-1.78 2.96.36-.12.74-.18 1.13-.18 1.16 0 2.13.41 2.92 1.22.79.82 1.18 1.81 1.18 2.99 0 1.18-.42 2.17-1.27 2.97-.85.81-1.85 1.22-3.03 1.22Z" />
-                </svg>
-                <blockquote className="mt-3 text-base text-[var(--color-ink)] leading-relaxed flex-1">
-                  &ldquo;{t.quote}&rdquo;
-                </blockquote>
-                <figcaption className="mt-5 text-sm">
-                  <div className="font-semibold text-[var(--color-accent)]">
-                    {t.name}
-                  </div>
-                  <div className="text-[var(--color-ink-muted)]">{t.org}</div>
-                </figcaption>
-              </figure>
-            </Reveal>
-          ))}
-        </div>
-
-        <Reveal>
-          <DualCTA />
-        </Reveal>
-      </div>
-    </section>
-  );
-}
-
 function FAQItem({ q, a, idx }: { q: string; a: string; idx: number }) {
   const [open, setOpen] = useState(false);
   return (
@@ -692,7 +641,6 @@ export default function GulfBayLandingPage() {
         ))}
         <WhyUsSection />
         <ProcessSection />
-        <TestimonialsSection />
         <FAQSection />
         <ContactSection />
       </main>

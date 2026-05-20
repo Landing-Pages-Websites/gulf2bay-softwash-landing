@@ -202,30 +202,11 @@ export const PROCESS_STEPS: { step: string; title: string; body: string }[] = [
 ];
 
 export const TESTIMONIALS: Testimonial[] = [
-  {
-    name: "M. Crawford",
-    org: "East Hampton, NY",
-    quote:
-      "The ipe deck looked exhausted after eight winters. Gulf2Bay's crew brought back the original color, sealed it properly, and three seasons later it still looks the way it did the week they finished. Worth every dollar.",
-  },
-  {
-    name: "S. Marino",
-    org: "Cold Spring Harbor, NY",
-    quote:
-      "We had three other companies refuse to touch the cedar shake — they kept recommending paint. Gulf2Bay restored every square foot and saved us from a six-figure re-siding job.",
-  },
-  {
-    name: "R. Halpern",
-    org: "Sands Point, NY",
-    quote:
-      "Professional, certified, and the only crew we've had who actually understood how to handle a bluestone patio without destroying the joints. They've done two of our family properties now.",
-  },
-  {
-    name: "L. Devereaux",
-    org: "Bridgehampton, NY",
-    quote:
-      "Eco-friendly products near the koi pond and the landscaping was non-negotiable. Gulf2Bay's process was exactly what was promised, and the house looks new. Recommended.",
-  },
+  // NOTE: Intentionally empty. Gulf2Bay's live site does not publish any
+  // text reviews / testimonials that we can verify, so the LP omits the
+  // testimonials section entirely rather than fabricate copy. If/when the
+  // customer supplies a list of approved testimonials (with names, towns,
+  // and consent), populate this array and the section will render again.
 ];
 
 export const FAQS: FAQ[] = [

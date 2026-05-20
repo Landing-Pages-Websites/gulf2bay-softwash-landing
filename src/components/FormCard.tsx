@@ -22,14 +22,13 @@ type Props = {
  * Gulf2Bay Softwash — lead form.
  * Task: aa76a8ad-9749-4ea3-b28c-dfd295378eb8
  *
- * Fields (EXACT, in submit order):
+ * Fields (EXACT, in submit order — 1:1 with task input `form_fields`):
  *   1. firstName        required
  *   2. lastName         required
  *   3. email            required
  *   4. phone            required (10-digit US)
  *   5. homeowner        required — Q1: 'Are you the homeowner or property manager?'
  *   6. factor           required — Q2: 'What factor is most important when hiring a contractor?'
- *   7. message          optional — open-text for project details
  *
  * Submission policy (per task spec):
  *   - EVERY filled form submits to the lead API.
@@ -90,7 +89,6 @@ export function FormCard({
   const [phone, setPhone] = useState("");
   const [homeowner, setHomeowner] = useState<HomeownerValue | "">("");
   const [factor, setFactor] = useState<FactorValue | "">("");
-  const [message, setMessage] = useState("");
 
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
@@ -124,7 +122,6 @@ export function FormCard({
       phone: phoneDigits,
       homeowner: h,
       factor: f,
-      message: message.trim() || undefined,
       qualified,
       disqualification_reason: qualified ? undefined : reason,
     };
@@ -419,21 +416,6 @@ export function FormCard({
               <ChevronDown />
             </div>
           </div>
-        </div>
-
-        <div>
-          <label htmlFor={`msg-${idSuffix}`} className="sr-only">
-            Tell us about your project
-          </label>
-          <textarea
-            id={`msg-${idSuffix}`}
-            name="message"
-            rows={3}
-            placeholder="Tell us about your project (optional) — surfaces, wood type, condition…"
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
-            className={inputClass}
-          />
         </div>
 
         {/* type="button" + validate-first + requestSubmit pattern per AGENTS.md
