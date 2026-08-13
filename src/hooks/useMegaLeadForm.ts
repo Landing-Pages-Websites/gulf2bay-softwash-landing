@@ -265,9 +265,14 @@ export function useMegaLeadForm(
       }
 
       // A 2xx status is not acceptance: the API signals a real save with
-      // `{ ok: true }`. Normalize to a strict boolean so callers can gate on
-      // `res.ok === true` and treat any other body as a failure.
-      return { ok: body?.ok === true, id: body?.id };
+      // `{ ok: true }`. Any other parsed body is a failure and must throw so
+      // the submission path fails closed instead of reporting a false success.
+      if (!body || body.ok !== true) {
+        throw new Error(
+          `Submission rejected: ${JSON.stringify(body)?.slice(0, 200)}`,
+        );
+      }
+      return body;
     },
     [options.customerId, options.siteId, options.sourceProvider],
   );
