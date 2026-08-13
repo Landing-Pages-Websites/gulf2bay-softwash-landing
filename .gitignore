@@ -5,3 +5,7 @@ node_modules/
 .DS_Store
 *.tsbuildinfo
 next-env.d.ts
+
+# CC loadout (web-coding-os) - never commit
+.claude/
+.mcp.json
