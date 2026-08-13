@@ -37,9 +37,15 @@ type Props = {
  *     for qualified leads. Disqualified leads still land in the lead pipeline.
  *   - Mega Admin docs require BOTH paths reach the API (Peter mandate 2026-05-14).
  *
- * Anti-disruption pattern (button type="button" + validate-first + requestSubmit)
- * prevents Mega optimizer from firing duplicate form_submit on native submit.
+ * Anti-disruption pattern (button type="button" + validate-first + direct
+ * performSubmit) prevents Mega optimizer from firing duplicate form_submit; the
+ * native submit event is dispatched once, by hand, only after a real success.
  */
+
+// Shown in-place (never a success card) when a submit fails: HTTP error,
+// network drop, or a 2xx body that is not { ok: true }. Retryable, and points
+// to the authorized business line as plain text via BRAND.phone.
+const SUBMIT_ERROR_MESSAGE = `Something went wrong sending your request. Please try again, or call us at ${BRAND.phone}.`;
 
 function formatPhone(value: string): string {
   const digits = value.replace(/\D/g, "").slice(0, 10);
@@ -82,6 +88,10 @@ export function FormCard({
   // rapid clicks can pass the `if (submitting) return` check before state
   // flips. The ref is set synchronously and blocks re-entry the same tick.
   const inFlightRef = useRef(false);
+  // Guards the programmatic native `submit` dispatch (fired once on real
+  // success so the MEGA optimizer records its conversion) so the form's
+  // onSubmit handler cannot re-enter performSubmit.
+  const dispatchingNativeRef = useRef(false);
 
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -103,6 +113,68 @@ export function FormCard({
     phoneValid &&
     homeowner.length > 0 &&
     factor.length > 0;
+
+  // Single tracking call site — invoked ONLY after res?.ok === true, so a
+  // dropped lead fires zero conversions. Fields are passed as separate keys so
+  // they land as separate columns in Mega Events / Keystone (Peter mandate
+  // 2026-05-14).
+  function fireTracking(
+    h: HomeownerValue,
+    f: FactorValue,
+    qualified: boolean,
+    reason: string | undefined,
+  ): void {
+    if (typeof window !== "undefined" && window.MegaTag?.trackEvent) {
+      try {
+        window.MegaTag.trackEvent("form_submit", {
+          element: `form-${idSuffix}`,
+          firstName: firstName.trim(),
+          lastName: lastName.trim(),
+          email: email.trim(),
+          phone: phoneDigits,
+          homeowner: h,
+          factor: f,
+          qualified,
+          disqualification_reason: qualified ? "" : reason ?? "",
+        });
+      } catch (trackErr) {
+        console.warn("MegaTag.trackEvent failed:", trackErr);
+      }
+    }
+
+    if (typeof window !== "undefined") {
+      window.dataLayer = window.dataLayer || [];
+      window.dataLayer.push({
+        event: "form_submission",
+        form_id: `form-${idSuffix}`,
+        qualified,
+      });
+      // Fire qualified_lead conversion event ONLY for qualified leads —
+      // Google Ads conversion is wired to this event in GTM.
+      if (qualified) {
+        window.dataLayer.push({
+          event: "qualified_lead",
+          form_id: `form-${idSuffix}`,
+        });
+      }
+    }
+
+    // The MEGA optimizer records its own conversion off a native submit event.
+    // Because the submit button is type="button" and calls performSubmit
+    // directly, that event never fires on its own, so dispatch it exactly once
+    // here — only on a real success. The guard stops the onSubmit handler from
+    // re-entering this path.
+    if (formRef.current && !dispatchingNativeRef.current) {
+      dispatchingNativeRef.current = true;
+      try {
+        formRef.current.dispatchEvent(
+          new Event("submit", { bubbles: true, cancelable: true }),
+        );
+      } finally {
+        dispatchingNativeRef.current = false;
+      }
+    }
+  }
 
   async function performSubmit() {
     if (inFlightRef.current || submitted) return;
@@ -127,69 +199,49 @@ export function FormCard({
     };
 
     try {
-      await submit(formData);
-
-      // Manual form_submit event fire — our handler uses requestSubmit() which
-      // bypasses the optimizer's native auto-detect (AGENTS.md HARD RULE #5).
-      // Fields are passed as separate keys so they land as separate columns in
-      // Mega Events / Keystone (Peter mandate 2026-05-14).
-      if (typeof window !== "undefined" && window.MegaTag?.trackEvent) {
-        try {
-          window.MegaTag.trackEvent("form_submit", {
-            element: `form-${idSuffix}`,
-            firstName: firstName.trim(),
-            lastName: lastName.trim(),
-            email: email.trim(),
-            phone: phoneDigits,
-            homeowner: h,
-            factor: f,
-            qualified,
-            disqualification_reason: qualified ? "" : reason ?? "",
-          });
-        } catch (trackErr) {
-          console.warn("MegaTag.trackEvent failed:", trackErr);
-        }
-      }
-
-      // Manual GTM push — required because submit button uses type="button"
-      // (validate-first → requestSubmit) and GTM's form-submit trigger needs
-      // a custom event hook. Mirrors AGENTS.md Builds Lane HARD RULE #4.
-      if (typeof window !== "undefined") {
-        window.dataLayer = window.dataLayer || [];
-        window.dataLayer.push({
-          event: "form_submission",
-          form_id: `form-${idSuffix}`,
-          qualified,
-        });
-        // Fire qualified_lead conversion event ONLY for qualified leads —
-        // Google Ads conversion is wired to this event in GTM.
-        if (qualified) {
-          window.dataLayer.push({
-            event: "qualified_lead",
-            form_id: `form-${idSuffix}`,
-          });
-        }
+      const res = await submit(formData);
+      // Only a real save flips to the success card and fires conversions.
+      // HTTP errors, network drops, and any 2xx body that is not { ok: true }
+      // fall through to the retryable error state below.
+      if (res?.ok === true) {
+        fireTracking(h, f, qualified, reason);
+        setSubmitted(true);
+      } else {
+        setError(SUBMIT_ERROR_MESSAGE);
       }
     } catch (err) {
+      // Network drop or malformed response — a failed submit, not a success:
+      // keep the form retryable and fire nothing.
       console.error("Form submission failed:", err);
-      // Per builder Hard Rule #12: still transition to success; don't strand user.
-      setError("Something went wrong on our end — we also got your info.");
+      setError(SUBMIT_ERROR_MESSAGE);
     } finally {
-      setSubmitted(true);
       setSubmitting(false);
-      // Leave inFlightRef true — the page is in the success state and the
-      // form is unmounted. No reason to ever flip it back.
+      // Clear the in-flight latch so a failed submit is retryable — on success
+      // the form unmounts anyway; on failure this is what lets a second click
+      // produce a second network call.
+      inFlightRef.current = false;
     }
   }
 
+  // Keep onSubmit inert: it only cancels the browser's default navigation so
+  // an Enter-in-a-field (or the programmatic dispatch above) cannot bypass the
+  // validate-first gate. All real submission goes through performSubmit.
   function handleFormSubmit(e: React.FormEvent) {
     e.preventDefault();
-    performSubmit();
   }
 
-  // Validate-first → requestSubmit pattern: button is type="button".
-  // Prevents the Mega optimizer from firing form_submit on a native submit
-  // event when validation would have blocked it (AGENTS.md HARD RULE #3).
+  // Enter-to-submit: the button no longer triggers a native submit, so route
+  // Enter (outside a textarea) through the same validate-first path.
+  function handleFormKeyDown(e: React.KeyboardEvent<HTMLFormElement>) {
+    if (e.key !== "Enter") return;
+    if ((e.target as HTMLElement).tagName === "TEXTAREA") return;
+    e.preventDefault();
+    handleButtonClick();
+  }
+
+  // Validate-first pattern — button is type="button" and calls performSubmit
+  // directly (no native submit event) so the Mega optimizer cannot fire
+  // form_submit before validation or before the fetch resolves.
   function handleButtonClick() {
     // Synchronous re-entry guard — blocks rapid double/triple clicks before
     // React's submitting state flips.
@@ -198,7 +250,7 @@ export function FormCard({
       formRef.current?.reportValidity();
       return;
     }
-    formRef.current?.requestSubmit();
+    performSubmit();
   }
 
   const wrapperClass =
@@ -244,10 +296,6 @@ export function FormCard({
             </a>
             .
           </p>
-
-          {error && (
-            <p className="text-xs text-[var(--color-ink-muted)]">(Note: {error})</p>
-          )}
         </div>
       </div>
     );
@@ -269,6 +317,7 @@ export function FormCard({
       <form
         ref={formRef}
         onSubmit={handleFormSubmit}
+        onKeyDown={handleFormKeyDown}
         noValidate={false}
         className="space-y-3"
       >
@@ -418,8 +467,19 @@ export function FormCard({
           </div>
         </div>
 
-        {/* type="button" + validate-first + requestSubmit pattern per AGENTS.md
-            Hard Rule #5 — prevents Mega optimizer duplicate form_submit. */}
+        {error && (
+          <p
+            role="alert"
+            aria-live="polite"
+            className="!mt-0 rounded-lg border border-red-300 bg-[#fef3f2] px-3.5 py-2.5 text-sm font-semibold !text-[#b91c1c]"
+          >
+            {error}
+          </p>
+        )}
+
+        {/* type="button" + validate-first pattern: onClick calls performSubmit
+            directly (no native submit event) so the Mega optimizer never fires
+            a duplicate form_submit before validation or before fetch resolves. */}
         <button
           type="button"
           onClick={handleButtonClick}

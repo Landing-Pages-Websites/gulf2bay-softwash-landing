@@ -254,7 +254,20 @@ export function useMegaLeadForm(
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}`);
       }
-      return (await response.json()) as SubmissionResponse;
+
+      let body: SubmissionResponse | null;
+      try {
+        body = (await response.json()) as SubmissionResponse | null;
+      } catch (parseErr) {
+        const detail =
+          parseErr instanceof Error ? parseErr.message : String(parseErr);
+        throw new Error(`Malformed submission response: ${detail}`);
+      }
+
+      // A 2xx status is not acceptance: the API signals a real save with
+      // `{ ok: true }`. Normalize to a strict boolean so callers can gate on
+      // `res.ok === true` and treat any other body as a failure.
+      return { ok: body?.ok === true, id: body?.id };
     },
     [options.customerId, options.siteId, options.sourceProvider],
   );
